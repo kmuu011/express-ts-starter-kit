@@ -11,7 +11,7 @@ export class CookieUtility {
       tokenCode,
       {
         httpOnly: true,
-        secure: SERVER_TYPE !== "local",
+        secure: SERVER_TYPE !== "dev",
         sameSite: "strict",
         maxAge: config.memberAuth.expireTime * 1000
       }

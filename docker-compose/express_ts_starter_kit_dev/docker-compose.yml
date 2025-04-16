@@ -1,6 +1,6 @@
 services:
   nginx:
-    container_name: "local_nginx"
+    container_name: "dev_nginx"
     image: nginx:1.25.2-alpine
     ports: [ "8100:8100" ]
     volumes:
@@ -11,7 +11,7 @@ services:
         ipv4_address: 172.20.0.2
 
   redis:
-    container_name: "local_redis"
+    container_name: "dev_redis"
     ports: [ "6379:6379" ]
     image: "redis"
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
         ipv4_address: 172.20.0.3
 
   mysql:
-    container_name: "local_mysql"
+    container_name: "dev_mysql"
     image: mysql:8.0.34
     ports: [ "3307:3307" ]
     command:
@@ -36,7 +36,7 @@ services:
       - ./sql/initSql.sql:/docker-entrypoint-initdb.d/init.sql:ro
     environment:
       MYSQL_PASSWORD: root
-      MYSQL_USER: local
+      MYSQL_USER: dev
       MYSQL_DATABASE: my_db
       MYSQL_ROOT_PASSWORD: root
     restart: unless-stopped

@@ -19,6 +19,4 @@ COPY --from=builder /server/package*.json ./
 
 RUN npm ci --omit=dev
 
-ENV NODE_ENV=production
-
-CMD ["node", "dist/bin/www.js"]
+CMD ["npm", "run", "start:production"]

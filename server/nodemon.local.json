@@ -1,7 +1,0 @@
-{
-  "watch": ["src", "tsconfig.json"],
-  "ext": "ts",
-  "exec": "npm run build:local & node dist/bin/www.js",
-  "ignore": ["dist/*"],
-  "delay": 200
-}

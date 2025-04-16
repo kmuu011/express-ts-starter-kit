@@ -36,7 +36,7 @@ services:
       - ./sql/initSql.sql:/docker-entrypoint-initdb.d/init.sql:ro
     environment:
       MYSQL_PASSWORD: root
-      MYSQL_USER: local
+      MYSQL_USER: prod
       MYSQL_DATABASE: my_db
       MYSQL_ROOT_PASSWORD: root
     restart: unless-stopped
@@ -46,7 +46,7 @@ services:
 
   node_0:
     container_name: "production_node_0"
-    image: local/ts-express:latest
+    image: production/ts-express:latest
     ports: [ "8200:8200" ]
     restart: unless-stopped
     networks:
@@ -55,7 +55,7 @@ services:
 
   node_1:
     container_name: "production_node_1"
-    image: local/ts-express:latest
+    image: production/ts-express:latest
     ports: [ "8201:8200" ]
     restart: unless-stopped
     networks:
