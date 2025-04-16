@@ -1,0 +1,59 @@
+version: '2.1'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker-compose/express_ts_starter_kit_production/docker_file/nginx/Dockerfile
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/config:/etc/nginx
+    expose:
+      - "8100"
+    container_name: "projectm-backend-nginx"
+    restart: always
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.2
+
+  redis:
+    ports:
+      - "6379"
+    image: "redis"
+    expose:
+      - "6379"
+    container_name: "projectm-backend-redis"
+    restart: always
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.4
+
+  node_0:
+    build:
+      context: .
+      dockerfile: docker-compose/express_ts_starter_kit_production/docker_file/node/Dockerfile
+    ports:
+      - "8200"
+    working_dir: /home/node
+    volumes:
+      - ./node:/home/node
+
+    environment:
+      TZ: "Asia/Seoul"
+
+    command: "npm run start:test"
+    expose:
+      - "8200"
+    restart: always
+    container_name: "projectm-backend-node-0"
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.5
+
+networks:
+  static-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
