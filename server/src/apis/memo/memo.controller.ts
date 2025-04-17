@@ -6,7 +6,6 @@ import {inject, injectable} from "inversify";
 
 @injectable()
 export class MemoController extends BaseController {
-
   constructor(
     @inject(DI_TYPES.MemoService) private readonly memoService: MemoService,
   ) {

@@ -35,7 +35,6 @@ router.use(async (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
-
   const contentType = req.headers["content-type"];
 
   if (contentType && contentType.startsWith("multipart/form-data")) {
@@ -57,7 +56,6 @@ router.use(dbMiddleware.attachDb());
 router.use("/file", fileRouter);
 router.use("/member", memberRouter);
 router.use("/memo", memoRouter);
-
 
 //next가 없을경우 에러가 정상적으로 처리되지 않음.
 router.use(async (err: Errback | Message, req: Request, res: Response, next: NextFunction) => {
