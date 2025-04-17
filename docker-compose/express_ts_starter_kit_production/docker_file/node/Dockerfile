@@ -2,10 +2,11 @@ FROM node:22.14.0 AS builder
 
 WORKDIR /server
 
-COPY server/package*.json ./
+COPY server/*.json ./
 RUN npm ci
 
-COPY server/. .
+COPY server/src ./src
+COPY server/env ./env
 
 RUN npm run build
 
