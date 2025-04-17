@@ -20,7 +20,7 @@ export class FileDao {
     }
   ): Promise<FileModel> {
     const sql = mysql.format(
-      "SELECT * FROM items WHERE idx = ? ",
+      "SELECT * FROM file WHERE idx = ? ",
       [idx]
     );
 

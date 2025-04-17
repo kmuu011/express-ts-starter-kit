@@ -3,7 +3,7 @@ FROM node:22.14.0 AS builder
 WORKDIR /server
 
 COPY server/package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY server/. .
 

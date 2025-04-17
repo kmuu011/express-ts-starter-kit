@@ -5,6 +5,7 @@ import {inject, injectable} from "inversify";
 import {DI_TYPES} from "../../common/inversify/DI_TYPES";
 import {FileDao} from "./file.dao";
 import {keyDescriptionObj} from "../../constants/keyDescriptionObj";
+import {existsSync, unlinkSync} from "node:fs";
 
 @injectable()
 export class FileService {
@@ -59,7 +60,7 @@ export class FileService {
     const memberIdx = req.memberInfo!.idx;
     const fileList = req?.files as MulterFile[];
 
-    for(const file of fileList) {
+    for (const file of fileList) {
       file.fileKey = `${config.filePath.file}${file.filename}`;
 
       const {
@@ -88,7 +89,17 @@ export class FileService {
       req: Request
     }
   ) {
+    const fileInfo = req.fileInfo;
+    const filePath = config.staticPath + fileInfo?.fileKey;
 
+    if (existsSync(filePath)) {
+      unlinkSync(filePath);
+    }
+
+    await this.fileDao.delete({
+      db: req.db!,
+      idx: fileInfo?.idx!
+    });
   }
 
 }

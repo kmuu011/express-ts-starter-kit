@@ -53,7 +53,7 @@ services:
       static-network:
         ipv4_address: 172.22.0.5
     volumes:
-      - static:/server/static
+      - ../../server/static:/server/static
 
   node_1:
     container_name: "production_node_1"
@@ -64,11 +64,10 @@ services:
       static-network:
         ipv4_address: 172.22.0.6
     volumes:
-      - static:/server/static
+      - ../../server/static:/server/static
 
 volumes:
   mysql:
-  static:
 
 networks:
   static-network:

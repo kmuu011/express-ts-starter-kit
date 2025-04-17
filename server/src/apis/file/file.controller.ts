@@ -18,8 +18,18 @@ export class FileController extends BaseController {
     res.json(result);
   }
 
+  public async getOne(req: Request, res: Response, next: NextFunction) {
+    req.fileInfo = await this.fileService.selectOne({req});
+  }
+
   public async upload(req: Request, res: Response, next: NextFunction) {
     await this.fileService.insert({req});
+
+    this.sendSuccess(res);
+  }
+
+  public async delete(req: Request, res: Response, next: NextFunction) {
+    await this.fileService.delete({req});
 
     this.sendSuccess(res);
   }

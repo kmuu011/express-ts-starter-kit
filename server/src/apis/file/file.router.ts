@@ -7,6 +7,9 @@ import multer from "multer";
 import {config} from "../../config";
 import {mkdirSync} from "fs";
 import {KeyUtility} from "../../utils/KeyUtility";
+import {existsSync} from "node:fs";
+import {Message} from "../../utils/MessageUtility";
+import {keyDescriptionObj} from "../../constants/keyDescriptionObj";
 
 const router = Router();
 
@@ -58,5 +61,46 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 router.post("/upload", upload.any(), async (req: Request, res: Response, next: NextFunction) => {
   await fileController.upload(req, res, next);
 });
+
+router.use("/:fileIdx(\\d+)", (() => {
+  const router = Router({
+    mergeParams: true,
+  });
+
+  router.use(async (req: Request, res: Response, next: NextFunction) => {
+    await fileController.getOne(req, res, next);
+    next();
+  });
+
+  router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+    res.json(req.fileInfo);
+  });
+
+  router.post("/download", async (req: Request, res: Response, next: NextFunction) => {
+    const fileInfo = req.fileInfo;
+    const filePath = config.staticPath + fileInfo?.fileKey;
+
+    if (!existsSync(filePath)) {
+      throw Message.NOT_EXIST(keyDescriptionObj.file);
+    }
+
+    res.download(
+      filePath,
+      `${fileInfo?.fileName}.${fileInfo?.fileType}`,
+      (err) => {
+        if(!res.headersSent){
+          console.log(err);
+          throw Message.SERVER_ERROR;
+        }
+      }
+    )
+  });
+
+  router.delete("/", async (req: Request, res: Response, next: NextFunction) => {
+    await fileController.delete(req, res, next);
+  });
+
+  return router;
+})());
 
 export default router;
