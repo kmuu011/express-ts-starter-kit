@@ -13,23 +13,33 @@ export class FileController extends BaseController {
   }
 
   public async getList(req: Request, res: Response, next: NextFunction) {
-    const result = await this.fileService.selectList({req});
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const count = parseInt(req.query.count as string, 10) || 10;
+
+    const result = await this.fileService.selectList(req.db!, page, count);
 
     res.json(result);
   }
 
   public async getOne(req: Request, res: Response, next: NextFunction) {
-    req.fileInfo = await this.fileService.selectOne({req});
+    const fileIdx = Number(req.params.fileIdx);
+    
+    req.fileInfo = await this.fileService.selectOne(req.db!, fileIdx);
   }
 
   public async upload(req: Request, res: Response, next: NextFunction) {
-    await this.fileService.insert({req});
+    const memberIdx = req.memberInfo!.idx;
+    const fileList = req?.files as MulterFile[];
+
+    await this.fileService.insert(req.db!, memberIdx, fileList);
 
     this.sendSuccess(res);
   }
 
   public async delete(req: Request, res: Response, next: NextFunction) {
-    await this.fileService.delete({req});
+    const fileInfo = req.fileInfo;
+
+    await this.fileService.delete(req.db!, fileInfo);
 
     this.sendSuccess(res);
   }

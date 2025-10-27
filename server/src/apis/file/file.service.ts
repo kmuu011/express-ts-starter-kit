@@ -1,4 +1,3 @@
-import {Request} from "express";
 import {config} from "../../config";
 import {Message} from "../../utils/MessageUtility";
 import {inject, injectable} from "inversify";
@@ -13,16 +12,11 @@ export class FileService {
   }
 
   async selectOne(
-    {
-      req
-    }: {
-      req: Request
-    }
+    db: any,
+    fileIdx: number
   ) {
-    const fileIdx = Number(req.params.fileIdx);
-
     const file = await this.fileDao.selectOne({
-      db: req.db!,
+      db,
       idx: fileIdx
     });
 
@@ -34,32 +28,22 @@ export class FileService {
   }
 
   async selectList(
-    {
-      req
-    }: {
-      req: Request
-    }
+    db: any,
+    page: number,
+    count: number
   ) {
-    const page = parseInt(req.query.page as string, 10) || 1;
-    const count = parseInt(req.query.count as string, 10) || 10;
-
     return await this.fileDao.selectList({
-      db: req.db!,
+      db,
       page,
       count
     });
   }
 
   async insert(
-    {
-      req
-    }: {
-      req: Request
-    }
+    db: any,
+    memberIdx: number,
+    fileList: MulterFile[]
   ) {
-    const memberIdx = req.memberInfo!.idx;
-    const fileList = req?.files as MulterFile[];
-
     for (const file of fileList) {
       file.fileKey = `${config.filePath.file}${file.filename}`;
 
@@ -71,7 +55,7 @@ export class FileService {
       } = file;
 
       await this.fileDao.insert({
-        db: req.db!,
+        db,
         fileKey,
         fileName: fileName!,
         fileType: fileType!,
@@ -79,17 +63,12 @@ export class FileService {
         memberIdx,
       });
     }
-
   }
 
   async delete(
-    {
-      req
-    }: {
-      req: Request
-    }
+    db: any,
+    fileInfo: any
   ) {
-    const fileInfo = req.fileInfo;
     const filePath = config.staticPath + fileInfo?.fileKey;
 
     if (existsSync(filePath)) {
@@ -97,7 +76,7 @@ export class FileService {
     }
 
     await this.fileDao.delete({
-      db: req.db!,
+      db,
       idx: fileInfo?.idx!
     });
   }

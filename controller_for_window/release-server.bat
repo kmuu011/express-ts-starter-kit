@@ -1,6 +1,6 @@
 cd ..
 cd docker-compose
-cd express_ts_starter_kit_production
+cd prod
 
 docker compose stop node_0
 docker compose rm -f node_0

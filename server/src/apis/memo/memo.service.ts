@@ -1,4 +1,3 @@
-import {Request} from "express";
 import {keyDescriptionObj} from "../../constants/keyDescriptionObj";
 import {MemoDao} from "./memo.dao";
 import {MemoModel} from "./memo.model";
@@ -17,12 +16,11 @@ export class MemoService extends BaseService {
   }
 
   async selectOne(
-    req: Request
+    db: any,
+    memoIdx: number
   ): Promise<MemoModel> {
-    const memoIdx = Number(req.params.memoIdx);
-
     const memoInfo = await this.memoDao.selectOne({
-      db: req.db!,
+      db,
       idx: memoIdx
     });
 
@@ -34,17 +32,16 @@ export class MemoService extends BaseService {
   }
 
   async selectList(
-    req: Request
+    db: any,
+    page: number,
+    count: number,
+    memberIdx: number
   ): Promise<PaginatedServiceData<MemoModel>> {
-    const page = parseInt(req.query.page as string, 10) || 1;
-    const count = parseInt(req.query.count as string, 10) || 10;
-    const memberIdx = req.memberInfo!.idx;
-
     const {
       itemList,
       totalCount
     } = await this.memoDao.selectList({
-      db: req.db!,
+      db,
       page,
       count,
       memberIdx
@@ -59,15 +56,12 @@ export class MemoService extends BaseService {
   }
 
   async insert(
-    req: Request
+    db: any,
+    memberIdx: number,
+    content: string
   ): Promise<{ idx: number }> {
-    const {
-      content
-    } = req.body;
-    const memberIdx = req.memberInfo!.idx;
-
     const insertResult = await this.memoDao.insert({
-      db: req.db!,
+      db,
       memberIdx,
       content
     });
@@ -76,26 +70,23 @@ export class MemoService extends BaseService {
   }
 
   async update(
-    req: Request
+    db: any,
+    idx: number,
+    content: string
   ): Promise<void> {
-    const idx = req.memoInfo?.idx!;
-
-    const {content} = req.body;
-
     await this.memoDao.update({
-      db: req.db!,
+      db,
       idx,
       content
     });
   }
 
   async delete(
-    req: Request
+    db: any,
+    idx: number
   ): Promise<void> {
-    const idx = req.memoInfo?.idx!;
-
     await this.memoDao.delete({
-      db: req.db!,
+      db,
       idx
     });
   }

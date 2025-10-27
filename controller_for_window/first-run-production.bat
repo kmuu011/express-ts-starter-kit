@@ -1,6 +1,6 @@
 call build-server-image.bat
 
 cd docker-compose
-cd express_ts_starter_kit_production
+cd prod
 
 docker compose up -d & pause

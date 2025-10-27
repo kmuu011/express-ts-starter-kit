@@ -13,29 +13,43 @@ export class MemoController extends BaseController {
   }
 
   public async getList(req: Request, res: Response, next: NextFunction) {
-    const result = await this.memoService.selectList(req);
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const count = parseInt(req.query.count as string, 10) || 10;
+    const memberIdx = req.memberInfo!.idx;
+
+    const result = await this.memoService.selectList(req.db!, page, count, memberIdx);
 
     res.json(result);
   }
 
   public async getOne(req: Request, res: Response, next: NextFunction) {
-    req.memoInfo = await this.memoService.selectOne(req);
+    const memoIdx = Number(req.params.memoIdx);
+    
+    req.memoInfo = await this.memoService.selectOne(req.db!, memoIdx);
   }
 
   public async insert(req: Request, res: Response, next: NextFunction) {
-    const result = await this.memoService.insert(req);
+    const { content } = req.body;
+    const memberIdx = req.memberInfo!.idx;
+
+    const result = await this.memoService.insert(req.db!, memberIdx, content);
 
     res.json(result);
   }
 
   public async update(req: Request, res: Response, next: NextFunction) {
-    await this.memoService.update(req);
+    const idx = req.memoInfo?.idx!;
+    const { content } = req.body;
+
+    await this.memoService.update(req.db!, idx, content);
 
     this.sendSuccess(res);
   }
 
   public async delete(req: Request, res: Response, next: NextFunction) {
-    await this.memoService.delete(req);
+    const idx = req.memoInfo?.idx!;
+
+    await this.memoService.delete(req.db!, idx);
 
     this.sendSuccess(res);
   }

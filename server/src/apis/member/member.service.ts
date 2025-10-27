@@ -1,11 +1,8 @@
-import {Request, Response} from "express";
 import {MemberDao} from "./member.dao";
 import {EncryptUtility} from "../../utils/EncryptUtility";
 import {TokenService} from "../../common/token/token.service";
 import {inject, injectable} from "inversify";
 import {DI_TYPES} from "../../common/inversify/DI_TYPES";
-import {Utility} from "../../utils/Utility";
-import {CookieUtility} from "../../utils/CookieUtility";
 import {Message} from "../../utils/MessageUtility";
 import {keyDescriptionObj} from "../../constants/keyDescriptionObj";
 
@@ -22,55 +19,46 @@ export class MemberService {
   }
 
   public async login(
-    req: Request,
-    res: Response
-  ): Promise<string> {
-    const {
-      id,
-      password
-    } = req.body;
-
+    db: any,
+    id: string,
+    password: string,
+    userAgent: string
+  ): Promise<{ tokenCode: string; memberInfo: any }> {
     const encryptedPassword = EncryptUtility.encryptMemberPassword(password);
 
     const memberInfo = await this.memberDao.selectOne({
-      db: req.db!,
+      db,
       id,
       encryptedPassword
     });
 
-    const userInfo = Utility.getIpUserAgent(req);
+    if(!memberInfo) {
+      throw Message.NOT_EXIST(keyDescriptionObj.member);
+    }
 
     const token = await this.tokenService.createMemberToken(
       memberInfo,
-      userInfo.userAgent,
+      userAgent,
     );
 
     const tokenCode = await this.tokenService.cacheMemberToken(token);
 
-    CookieUtility.setCookieMemberToken(
-      res,
-      tokenCode
-    );
-
-    return tokenCode;
+    return { tokenCode, memberInfo };
   }
 
   public async duplicateCheck(
-    req: Request,
+    db: any,
+    value: string,
+    type: string
   ): Promise<boolean> {
-    const {
-      value,
-      type
-    } = req.query;
-
-    const typeNumber = parseInt(type as string);
+    const typeNumber = parseInt(type);
 
     const valueKey = duplicateCheckType[typeNumber];
 
     if (!valueKey) throw Message.WRONG_PARAM(keyDescriptionObj.type);
 
     const memberInfo = await this.memberDao.selectOne({
-      db: req.db!,
+      db,
       [valueKey]: value
     });
 
@@ -78,15 +66,12 @@ export class MemberService {
   }
 
   public async signup(
-    req: Request,
+    db: any,
+    id: string,
+    password: string
   ): Promise<void> {
-    const {
-      id,
-      password
-    } = req.body;
-
     const duplicatedMemberInfo = await this.memberDao.selectOne({
-      db: req.db!,
+      db,
       id
     });
 
@@ -97,17 +82,15 @@ export class MemberService {
     const encryptedPassword = EncryptUtility.encryptMemberPassword(password);
 
     await this.memberDao.insert({
-      db: req.db!,
+      db,
       id,
       encryptedPassword
     });
   }
 
   public async logout(
-    req: Request,
-    res: Response
+    tokenCode: string
   ): Promise<void> {
-    await this.tokenService.deleteMemberToken(req.tokenCode!);
-    CookieUtility.deleteCookieMemberToken(res);
+    await this.tokenService.deleteMemberToken(tokenCode);
   }
 }

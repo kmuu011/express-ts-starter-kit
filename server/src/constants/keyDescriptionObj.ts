@@ -1,6 +1,7 @@
 interface KeyDescriptionObj {
   [key: string]: any;
 
+  member: string;
   memo: string;
   file: string;
   type: string;
@@ -10,6 +11,7 @@ interface KeyDescriptionObj {
 }
 
 const keyDescriptionObj: KeyDescriptionObj = {
+  member: "회원",
   memo: "메모",
   file: "파일",
   type: "타입",

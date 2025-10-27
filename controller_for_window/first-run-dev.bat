@@ -1,6 +1,6 @@
 cd ..
 cd docker-compose
-cd express_ts_starter_kit_dev
+cd dev
 
 docker compose up -d
 

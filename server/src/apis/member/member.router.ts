@@ -31,7 +31,7 @@ router.get("/duplicateCheck", async (req: Request, res: Response, next: NextFunc
   );
 
   await memberController.duplicateCheck(req, res, next);
-})
+});
 
 router.post("/signup", async (req: Request, res: Response, next: NextFunction) => {
   ValidatorUtility.stringValidate(
