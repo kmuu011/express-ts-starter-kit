@@ -6,8 +6,10 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import api_logger from 'morgan';
+import swaggerUi from 'swagger-ui-express';
 
 import apis from "./apis";
+import { swaggerSpec } from "./config/swagger.config";
 
 const options = {etag: false};
 const app = express();
@@ -46,6 +48,12 @@ app.use(cookieParser());
 app.use(express.static("./static", options));
 
 app.use('/api', apis);
+
+// Swagger UI 설정
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'DocConnect EMR API Docs'
+}));
 
 app.use((req, res, next) => {
   res.status(404).json({
