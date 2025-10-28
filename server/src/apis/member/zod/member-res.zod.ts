@@ -3,22 +3,22 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
 extendZodWithOpenApi(z);
 
-export const LoginResponseDto = z.object({
+export const LoginResponseSchema = z.object({
   sessionKey: z.string().describe('JWT 토큰 코드')
     .openapi({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
 });
 
-export const SignupResponseDto = z.object({
+export const SignupResponseSchema = z.object({
   result: z.boolean().describe('요청 성공 여부')
     .openapi({ example: true })
 });
 
-export const DuplicateCheckResponseDto = z.object({
+export const DuplicateCheckResponseSchema = z.object({
   isDuplicated: z.boolean().describe('중복 여부')
     .openapi({ example: false })
 });
 
-export const MemberResponseDto = z.object({
+export const MemberResponseSchema = z.object({
   idx: z.number().describe('사용자 고유 번호')
     .openapi({ example: 1 }),
   id: z.string().describe('사용자 아이디')
@@ -29,12 +29,12 @@ export const MemberResponseDto = z.object({
     .openapi({ example: '2024-01-01T00:00:00.000Z' })
 });
 
-export const LogoutResponseDto = z.object({
+export const LogoutResponseSchema = z.object({
   result: z.boolean().describe('요청 성공 여부')
     .openapi({ example: true })
 });
 
-export const ErrorResponseDto = z.object({
+export const ErrorResponseSchema = z.object({
   status: z.number().describe('HTTP 상태 코드')
     .openapi({ example: 400 }),
   errors: z.string().describe('에러 타입')

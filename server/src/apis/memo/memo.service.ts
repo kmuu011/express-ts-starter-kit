@@ -1,11 +1,12 @@
-import {keyDescriptionObj} from "../../constants/keyDescriptionObj";
-import {MemoDao} from "./memo.dao";
-import {MemoModel} from "./memo.model";
-import {Message} from "../../utils/MessageUtility";
-import {BaseService} from "../../common/base/base.service";
-import {inject, injectable} from "inversify";
-import {DI_TYPES} from "../../common/inversify/DI_TYPES";
-import {PaginatedServiceData} from "../../interfaces/common";
+import { keyDescriptionObj } from "../../constants/keyDescriptionObj";
+import { MemoDao } from "./memo.dao";
+import { Message } from "../../utils/MessageUtility";
+import { BaseService } from "../../common/base/base.service";
+import { inject, injectable } from "inversify";
+import { DI_TYPES } from "../../common/inversify/DI_TYPES";
+import { PaginatedServiceData } from "../../interfaces/common";
+import { Database } from "../../utils/Database";
+import { MemoModelType } from "./memo.types";
 
 @injectable()
 export class MemoService extends BaseService {
@@ -16,9 +17,9 @@ export class MemoService extends BaseService {
   }
 
   async selectOne(
-    db: any,
+    db: Database,
     memoIdx: number
-  ): Promise<MemoModel> {
+  ): Promise<MemoModelType> {
     const memoInfo = await this.memoDao.selectOne({
       db,
       idx: memoIdx
@@ -36,7 +37,7 @@ export class MemoService extends BaseService {
     page: number,
     count: number,
     memberIdx: number
-  ): Promise<PaginatedServiceData<MemoModel>> {
+  ): Promise<PaginatedServiceData<MemoModelType>> {
     const {
       itemList,
       totalCount
@@ -47,7 +48,7 @@ export class MemoService extends BaseService {
       memberIdx
     });
 
-    return this.returnListType<MemoModel>({
+    return this.returnListType<MemoModelType>({
       itemList,
       page,
       count,
@@ -66,7 +67,7 @@ export class MemoService extends BaseService {
       content
     });
 
-    return {idx: insertResult.insertId};
+    return { idx: insertResult.insertId };
   }
 
   async update(

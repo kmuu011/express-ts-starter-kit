@@ -1,4 +1,3 @@
-import { MemberModel } from "../../apis/member/member.model";
 import { config } from "../../config";
 import { CacheService } from "../cache/cache.service";
 import express from "express";
@@ -7,6 +6,7 @@ import { MemberDao } from "../../apis/member/member.dao";
 import { inject, injectable } from "inversify";
 import { DI_TYPES } from "../inversify/DI_TYPES";
 import { Utility } from "../../utils/Utility";
+import { MemberModel } from "../../apis/member/member.types";
 
 @injectable()
 export class TokenService {

@@ -1,9 +1,9 @@
-import {Database} from "../../utils/Database";
-import {MemberModel} from "./member.model";
-import {injectable} from "inversify";
-import {BaseDao} from "../../common/base/base.dao";
-import {SqlBuilder} from "../../utils/SqlBuilder";
-import {ResultSetHeader} from "mysql2";
+import { Database } from "../../utils/Database";
+import { injectable } from "inversify";
+import { BaseDao } from "../../common/base/base.dao";
+import { SqlBuilder } from "../../utils/SqlBuilder";
+import { ResultSetHeader } from "mysql2";
+import { MemberModel } from "./member.types";
 
 @injectable()
 export class MemberDao extends BaseDao {
@@ -23,7 +23,7 @@ export class MemberDao extends BaseDao {
       encryptedPassword?: string,
       idx?: number
     }
-  ): Promise<MemberModel> {
+  ): Promise<MemberModel | undefined> {
     this.validateArguments(arguments);
 
     const dataObj = {
@@ -42,7 +42,7 @@ export class MemberDao extends BaseDao {
       WHERE 1=1 ${sqlObj.sqlWhere}
       `;
 
-    return (await db.query({sql}))[0];
+    return (await db.query({ sql }))[0] as MemberModel | undefined;
   }
 
   async insert(

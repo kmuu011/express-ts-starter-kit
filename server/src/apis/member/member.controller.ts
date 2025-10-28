@@ -5,6 +5,9 @@ import { DI_TYPES } from "../../common/inversify/DI_TYPES";
 import { inject, injectable } from "inversify";
 import { Utility } from "../../utils/Utility";
 import { CookieUtility } from "../../utils/CookieUtility";
+import { LoginType } from "./member.types";
+import { SignupType } from "./member.types";
+import { DuplicateCheckType } from "./member.types";
 
 @injectable()
 export class MemberController extends BaseController {
@@ -15,7 +18,7 @@ export class MemberController extends BaseController {
   }
 
   public async login(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const { id, password } = req.body;
+    const { id, password } = req.validated?.body as LoginType;
     const userInfo = Utility.getIpUserAgent(req);
 
     const { sessionKey } = await this.memberService.login(
@@ -33,7 +36,7 @@ export class MemberController extends BaseController {
   }
 
   public async signup(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const { id, password } = req.body;
+    const { id, password } = req.validated?.body as SignupType;
 
     await this.memberService.signup(req.db!, id, password);
 
@@ -41,12 +44,12 @@ export class MemberController extends BaseController {
   }
 
   public async duplicateCheck(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const { value, type } = req.query;
+    const { value, type } = req.validated?.query as DuplicateCheckType;
 
     const isDuplicated = await this.memberService.duplicateCheck(
       req.db!,
-      value as string,
-      type as string
+      value,
+      type
     );
 
     res.json({ isDuplicated });

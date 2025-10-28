@@ -3,7 +3,7 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
 extendZodWithOpenApi(z);
 
-export const LoginDto = z.object({
+export const LoginSchema = z.object({
   id: z.string()
     .min(2, '아이디는 최소 2자 이상이어야 합니다.')
     .max(20, '아이디는 최대 20자까지 가능합니다.')
@@ -17,7 +17,7 @@ export const LoginDto = z.object({
     .openapi({ example: 'qa2' })
 })
 
-export const SignupDto = z.object({
+export const SignupSchema = z.object({
   id: z.string()
     .min(2, '아이디는 최소 2자 이상이어야 합니다.')
     .max(20, '아이디는 최대 20자까지 가능합니다.')
@@ -31,15 +31,16 @@ export const SignupDto = z.object({
     .openapi({ example: 'qa2' })
 })
 
-export const DuplicateCheckDto = z.object({
+export const DuplicateCheckSchema = z.object({
   value: z.string()
     .min(1, '검증할 값은 최소 1자 이상이어야 합니다.')
     .max(20, '검증할 값은 최대 20자까지 가능합니다.')
-    .describe('검증할 값 (아이디 또는 이메일)')
+    .describe('검증할 값 (아이디)')
     .openapi({ example: 'testuser' }),
-  type: z.number()
+  type: z.coerce.number()
     .int()
-    .refine((val) => val === 1 || val === 2, '검증 타입은 1(id) 또는 2(email)만 가능합니다.')
-    .describe('검증 타입 (1=아이디, 2=이메일)')
+    .min(1, '검증 타입은 1(id)만 가능합니다.')
+    .max(1, '검증 타입은 1(id)만 가능합니다.')
+    .describe('검증 타입 (1=아이디')
     .openapi({ example: 1 })
 });

@@ -5,9 +5,9 @@ import { DI_TYPES } from "../../common/inversify/DI_TYPES";
 import { MemberMiddleware } from "../../middleWare/MemberMiddleware";
 import { validateBody, validateQuery } from "../../common/middleware/zod-validation.middleware";
 import {
-  LoginDto,
-  SignupDto,
-  DuplicateCheckDto
+  LoginSchema,
+  SignupSchema,
+  DuplicateCheckSchema
 } from "./zod/member-req.zod";
 
 const router = Router();
@@ -15,15 +15,15 @@ const router = Router();
 const memberMiddleware = container.get<MemberMiddleware>(DI_TYPES.MemberMiddleware);
 const memberController = container.get<MemberController>(DI_TYPES.MemberController);
 
-router.post("/login", validateBody(LoginDto), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/login", validateBody(LoginSchema), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   await memberController.login(req, res, next);
 });
 
-router.get("/duplicateCheck", validateQuery(DuplicateCheckDto), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/duplicateCheck", validateQuery(DuplicateCheckSchema), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   await memberController.duplicateCheck(req, res, next);
 });
 
-router.post("/signup", validateBody(SignupDto), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/signup", validateBody(SignupSchema), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   await memberController.signup(req, res, next);
 });
 

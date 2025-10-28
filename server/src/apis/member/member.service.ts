@@ -5,6 +5,8 @@ import { inject, injectable } from "inversify";
 import { DI_TYPES } from "../../common/inversify/DI_TYPES";
 import { Message } from "../../utils/MessageUtility";
 import { keyDescriptionObj } from "../../constants/keyDescriptionObj";
+import { MemberModelType } from "./member.types";
+import { Database } from "../../utils/Database";
 
 const duplicateCheckType = [
   "id"
@@ -19,11 +21,11 @@ export class MemberService {
   }
 
   public async login(
-    db: any,
+    db: Database,
     id: string,
     password: string,
     userAgent: string
-  ): Promise<{ sessionKey: string; memberInfo: any }> {
+  ): Promise<{ sessionKey: string; memberInfo: MemberModelType }> {
     const encryptedPassword = EncryptUtility.encryptMemberPassword(password);
 
     const memberInfo = await this.memberDao.selectOne({
@@ -46,13 +48,11 @@ export class MemberService {
   }
 
   public async duplicateCheck(
-    db: any,
+    db: Database,
     value: string,
-    type: string
+    type: number
   ): Promise<boolean> {
-    const typeNumber = parseInt(type);
-
-    const valueKey = duplicateCheckType[typeNumber];
+    const valueKey = duplicateCheckType[type - 1];
 
     if (!valueKey) throw Message.WRONG_PARAM(keyDescriptionObj.type);
 
@@ -65,7 +65,7 @@ export class MemberService {
   }
 
   public async signup(
-    db: any,
+    db: Database,
     id: string,
     password: string
   ): Promise<void> {

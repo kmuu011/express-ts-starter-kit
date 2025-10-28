@@ -1,6 +1,6 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import { LoginDto, SignupDto, DuplicateCheckDto } from './zod/member-req.zod';
-import { LoginResponseDto, SignupResponseDto, DuplicateCheckResponseDto, LogoutResponseDto, ErrorResponseDto } from './zod/member-res.zod';
+import { LoginSchema, SignupSchema, DuplicateCheckSchema } from './zod/member-req.zod';
+import { LoginResponseSchema, SignupResponseSchema, DuplicateCheckResponseSchema, LogoutResponseSchema, ErrorResponseSchema } from './zod/member-res.zod';
 
 // Member API 경로 등록 함수
 export const registerMemberPaths = (registry: OpenAPIRegistry) => {
@@ -15,7 +15,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
       body: {
         content: {
           'application/json': {
-            schema: LoginDto
+            schema: LoginSchema
           }
         }
       }
@@ -25,7 +25,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '로그인 성공',
         content: {
           'application/json': {
-            schema: LoginResponseDto
+            schema: LoginResponseSchema
           }
         }
       },
@@ -33,7 +33,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '잘못된 요청 데이터',
         content: {
           'application/json': {
-            schema: ErrorResponseDto
+            schema: ErrorResponseSchema
           }
         }
       },
@@ -41,7 +41,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '인증 실패',
         content: {
           'application/json': {
-            schema: ErrorResponseDto
+            schema: ErrorResponseSchema
           }
         }
       }
@@ -59,7 +59,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
       body: {
         content: {
           'application/json': {
-            schema: SignupDto
+            schema: SignupSchema
           }
         }
       }
@@ -69,7 +69,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '회원가입 성공',
         content: {
           'application/json': {
-            schema: SignupResponseDto
+            schema: SignupResponseSchema
           }
         }
       },
@@ -77,7 +77,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '잘못된 요청 데이터',
         content: {
           'application/json': {
-            schema: ErrorResponseDto
+            schema: ErrorResponseSchema
           }
         }
       },
@@ -92,14 +92,14 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
     description: '아이디 또는 이메일의 중복 여부를 확인합니다.',
     tags: ['Member'],
     request: {
-      query: DuplicateCheckDto
+      query: DuplicateCheckSchema
     },
     responses: {
       200: {
         description: '중복 체크 결과',
         content: {
           'application/json': {
-            schema: DuplicateCheckResponseDto
+            schema: DuplicateCheckResponseSchema
           }
         }
       },
@@ -107,7 +107,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '잘못된 요청 데이터',
         content: {
           'application/json': {
-            schema: ErrorResponseDto
+            schema: ErrorResponseSchema
           }
         }
       }
@@ -127,7 +127,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '로그아웃 성공',
         content: {
           'application/json': {
-            schema: LogoutResponseDto
+            schema: LogoutResponseSchema
           }
         }
       },
@@ -135,7 +135,7 @@ export const registerMemberPaths = (registry: OpenAPIRegistry) => {
         description: '인증되지 않은 사용자',
         content: {
           'application/json': {
-            schema: ErrorResponseDto
+            schema: ErrorResponseSchema
           }
         }
       }
