@@ -1,10 +1,10 @@
-import {MemberDao} from "./member.dao";
-import {EncryptUtility} from "../../utils/EncryptUtility";
-import {TokenService} from "../../common/token/token.service";
-import {inject, injectable} from "inversify";
-import {DI_TYPES} from "../../common/inversify/DI_TYPES";
-import {Message} from "../../utils/MessageUtility";
-import {keyDescriptionObj} from "../../constants/keyDescriptionObj";
+import { MemberDao } from "./member.dao";
+import { EncryptUtility } from "../../utils/EncryptUtility";
+import { SessionService } from "../../common/session/session.service";
+import { inject, injectable } from "inversify";
+import { DI_TYPES } from "../../common/inversify/DI_TYPES";
+import { Message } from "../../utils/MessageUtility";
+import { keyDescriptionObj } from "../../constants/keyDescriptionObj";
 
 const duplicateCheckType = [
   "id"
@@ -14,7 +14,7 @@ const duplicateCheckType = [
 export class MemberService {
   constructor(
     @inject(DI_TYPES.MemberDao) private readonly memberDao: MemberDao,
-    @inject(DI_TYPES.TokenService) private readonly tokenService: TokenService
+    @inject(DI_TYPES.SessionService) private readonly sessionService: SessionService
   ) {
   }
 
@@ -23,7 +23,7 @@ export class MemberService {
     id: string,
     password: string,
     userAgent: string
-  ): Promise<{ tokenCode: string; memberInfo: any }> {
+  ): Promise<{ sessionKey: string; memberInfo: any }> {
     const encryptedPassword = EncryptUtility.encryptMemberPassword(password);
 
     const memberInfo = await this.memberDao.selectOne({
@@ -32,18 +32,17 @@ export class MemberService {
       encryptedPassword
     });
 
-    if(!memberInfo) {
+    if (!memberInfo) {
       throw Message.NOT_EXIST(keyDescriptionObj.member);
     }
 
-    const token = await this.tokenService.createMemberToken(
+    // 세션을 생성하고 세션 키 반환
+    const sessionKey = await this.sessionService.createSession(
       memberInfo,
       userAgent,
     );
 
-    const tokenCode = await this.tokenService.cacheMemberToken(token);
-
-    return { tokenCode, memberInfo };
+    return { sessionKey, memberInfo };
   }
 
   public async duplicateCheck(
@@ -89,8 +88,8 @@ export class MemberService {
   }
 
   public async logout(
-    tokenCode: string
+    sessionKey: string
   ): Promise<void> {
-    await this.tokenService.deleteMemberToken(tokenCode);
+    await this.sessionService.deleteSession(sessionKey);
   }
 }

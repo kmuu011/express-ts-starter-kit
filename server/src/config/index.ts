@@ -13,7 +13,7 @@ const config = {
     jwtSecret: 'JWTSecret',
     hashAlgorithm: 'sha512',
     expireTime: 60 * 60 * 24 * 30,
-    tokenRefreshTime: 60 * 60 * 24 * 7
+    refreshTime: 60 * 60 * 24 * 28
   },
 
   mysql: {

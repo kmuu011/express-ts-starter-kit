@@ -9,7 +9,7 @@ import api_logger from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 
 import apis from "./apis";
-import { swaggerSpec } from "./config/swagger.config";
+import { swaggerSpec } from "./swagger/swagger.config";
 
 const options = {etag: false};
 const app = express();
@@ -34,7 +34,7 @@ app.use(async (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'DELETE, GET, POST, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
-  res.header("Access-Control-Expose-Headers", "new-token-code");
+  res.header("Access-Control-Expose-Headers", "new-session-key");
   res.header('Content-Security-Policy', "frame-ancestors 'self' http://127.0.0.1:3000");
 
   next();

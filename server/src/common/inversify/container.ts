@@ -5,6 +5,7 @@ import {Database} from "../../utils/Database";
 import {DI_TYPES} from "./DI_TYPES";
 import {MemberService} from "../../apis/member/member.service";
 import {TokenService} from "../token/token.service";
+import {SessionService} from "../session/session.service";
 import {CacheService} from "../cache/cache.service";
 import {MemoService} from "../../apis/memo/memo.service";
 import {MemoDao} from "../../apis/memo/memo.dao";
@@ -22,6 +23,7 @@ const container = new Container();
 container.bind<Database>(DI_TYPES.Database).to(Database).inRequestScope();
 container.bind<CacheService>(DI_TYPES.CacheService).toConstantValue(cacheServiceInstance);
 container.bind<TokenService>(DI_TYPES.TokenService).to(TokenService);
+container.bind<SessionService>(DI_TYPES.SessionService).to(SessionService);
 container.bind<DbMiddleware>(DI_TYPES.DbMiddleWare).to(DbMiddleware);
 
 container.bind<MemberMiddleware>(DI_TYPES.MemberMiddleware).to(MemberMiddleware);

@@ -4,11 +4,11 @@ import {config} from "../config";
 export class CookieUtility {
   public static setCookieMemberToken(
     res: express.Response,
-    tokenCode: string
+    sessionKey: string
   ) {
     res.cookie(
-      "token-code",
-      tokenCode,
+      "session-key",
+      sessionKey,
       {
         httpOnly: true,
         secure: SERVER_TYPE !== "dev",
@@ -21,6 +21,6 @@ export class CookieUtility {
   public static deleteCookieMemberToken(
     res: express.Response,
   ) {
-    res.clearCookie("token-code");
+    res.clearCookie("session-key");
   }
 }

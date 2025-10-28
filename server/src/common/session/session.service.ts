@@ -9,14 +9,14 @@ import { DI_TYPES } from "../inversify/DI_TYPES";
 import { Utility } from "../../utils/Utility";
 
 @injectable()
-export class TokenService {
+export class SessionService {
   constructor(
     @inject(DI_TYPES.CacheService) private readonly cacheService: CacheService,
     @inject(DI_TYPES.MemberDao) private readonly memberDao: MemberDao,
   ) {
   }
 
-  public async createMemberToken(
+  public async createSession(
     memberInfo: MemberModel,
     userAgent: string
   ): Promise<string> {
@@ -26,7 +26,6 @@ export class TokenService {
       time: Date.now()
     };
 
-    // payload를 직접 세션에 저장하고 세션 키 반환
     const sessionKey = await this.cacheService.getCacheUnqKey();
 
     await this.cacheService.setCache(
@@ -38,19 +37,18 @@ export class TokenService {
     return sessionKey;
   }
 
-  public async deleteMemberToken(
+  public async deleteSession(
     sessionKey: string
   ): Promise<void> {
     await this.cacheService.deleteCache(sessionKey);
   }
 
-
-  public async tokenCodeValidation(
+  public async validateSession(
     req: express.Request,
-  ): Promise<{ tokenCode: string, isTokenExpiring: boolean }> {
+  ): Promise<{ sessionKey: string, isExpiring: boolean }> {
     const userInfo = Utility.getIpUserAgent(req);
 
-    const sessionKey = req.headers["token-code"] || req.cookies["token-code"];
+    const sessionKey = req.headers["session-key"] || req.cookies["session-key"];
 
     if (!sessionKey) {
       throw Message.UNAUTHORIZED;
@@ -85,16 +83,15 @@ export class TokenService {
     req.memberInfo = memberInfo;
     req.tokenCode = sessionKey;
 
-    // 토큰 만료 시간 체크 (payload.time 기준)
+    // 세션 만료 시간 체크 (payload.time 기준)
     const now = Date.now();
-    const tokenAge = now - payload.time;
-    const isTokenExpiring = tokenAge > (config.memberAuth.expireTime * 1000 * 0.8); // 80% 지났으면 갱신 필요
+    const sessionAge = now - payload.time;
+    const remainingTime = (config.memberAuth.expireTime * 1000) - sessionAge;
+    const isExpiring = remainingTime <= (config.memberAuth.refreshTime * 1000); // refreshTime 이하로 남았으면 갱신 필요
 
     return {
-      tokenCode: sessionKey,
-      isTokenExpiring,
+      sessionKey,
+      isExpiring,
     };
   }
-
-
 }

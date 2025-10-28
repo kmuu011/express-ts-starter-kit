@@ -1,14 +1,14 @@
-import {NextFunction, Request, Response} from "express";
-import {TokenService} from "../common/token/token.service";
-import {inject, injectable} from "inversify";
-import {DI_TYPES} from "../common/inversify/DI_TYPES";
-import {Utility} from "../utils/Utility";
-import {CookieUtility} from "../utils/CookieUtility";
+import { NextFunction, Request, Response } from "express";
+import { SessionService } from "../common/session/session.service";
+import { inject, injectable } from "inversify";
+import { DI_TYPES } from "../common/inversify/DI_TYPES";
+import { Utility } from "../utils/Utility";
+import { CookieUtility } from "../utils/CookieUtility";
 
 @injectable()
 export class MemberMiddleware {
   constructor(
-    @inject(DI_TYPES.TokenService) private readonly tokenService: TokenService,
+    @inject(DI_TYPES.SessionService) private readonly sessionService: SessionService,
   ) {
   }
 
@@ -18,32 +18,31 @@ export class MemberMiddleware {
     next: NextFunction
   ): Promise<void> => {
     const {
-      tokenCode,
-      isTokenExpiring
-    } = await this.tokenService.tokenCodeValidation(req);
+      sessionKey,
+      isExpiring
+    } = await this.sessionService.validateSession(req);
 
-    if (!isTokenExpiring) {
+    if (!isExpiring) {
       next();
       return;
     }
 
     const userInfo = Utility.getIpUserAgent(req);
 
-    const newToken = await this.tokenService.createMemberToken(
+    // 세션 갱신
+    const newSessionKey = await this.sessionService.createSession(
       req.memberInfo!,
       userInfo.userAgent
     );
 
-    const newTokenCode = await this.tokenService.cacheMemberToken(newToken);
-
     CookieUtility.setCookieMemberToken(
       res,
-      newTokenCode,
+      newSessionKey,
     );
 
-    res.header("new-token-code", newTokenCode);
+    res.header("new-session-key", newSessionKey);
 
-    await this.tokenService.deleteMemberToken(tokenCode);
+    await this.sessionService.deleteSession(sessionKey);
 
     next();
   }

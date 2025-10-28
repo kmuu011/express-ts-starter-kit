@@ -1,14 +1,15 @@
-import express, {Errback, NextFunction, Response, Request} from 'express';
+import express, { Errback, NextFunction, Response, Request } from 'express';
 import multer from "multer";
-import {TextUtility} from "../utils/TextUtility";
-import {FileUtility} from "../utils/FileUtility";
-import {Message} from "../utils/MessageUtility";
+import { ZodError } from "zod";
+import { TextUtility } from "../utils/TextUtility";
+import { FileUtility } from "../utils/FileUtility";
+import { Message } from "../utils/MessageUtility";
 import memberRouter from "./member/member.router";
 import memoRouter from "./memo/memo.router";
-import {container} from "../common/inversify/container";
-import {DbMiddleware} from "../middleWare/DbMiddleware";
-import {DI_TYPES} from "../common/inversify/DI_TYPES";
-import {XssChecker} from "../utils/XssChecker";
+import { container } from "../common/inversify/container";
+import { DbMiddleware } from "../middleWare/DbMiddleware";
+import { DI_TYPES } from "../common/inversify/DI_TYPES";
+import { XssChecker } from "../utils/XssChecker";
 import fileRouter from "./file/file.router";
 
 const dbMiddleware = container.get<DbMiddleware>(DI_TYPES.DbMiddleWare);
@@ -21,7 +22,7 @@ const validateRequestData = (req: Request) => {
 
   TextUtility.deactivateQuestionMarkInCollections(req.query);
   TextUtility.deactivateQuestionMarkInCollections(req.body);
-}
+};
 
 const uploadExceptionUrlList = [
   "/api/file/upload"
@@ -58,7 +59,7 @@ router.use("/member", memberRouter);
 router.use("/memo", memoRouter);
 
 //next가 없을경우 에러가 정상적으로 처리되지 않음.
-router.use(async (err: Errback | Message, req: Request, res: Response, next: NextFunction) => {
+router.use(async (err: Errback | Message | ZodError, req: Request, res: Response, next: NextFunction) => {
   console.log(err);
 
   if (err instanceof Message) {
@@ -66,6 +67,20 @@ router.use(async (err: Errback | Message, req: Request, res: Response, next: Nex
 
     res.status(status).json(err);
     return
+  }
+
+  if (err instanceof ZodError) {
+    const errorMessages = err.issues.map((issue: any) => {
+      const path = issue.path.join('.');
+      return `${path}: ${issue.message}`;
+    });
+
+    res.status(400).json({
+      status: 400,
+      errors: 'Invalid input data',
+      message: errorMessages.join(', '),
+    });
+    return;
   }
 
   // Message를 경유한 예상된 처리가 아닐경우 보안을 위해 SERVER_ERROR로 처리
