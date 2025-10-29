@@ -4,15 +4,18 @@ import { ZodError } from "zod";
 import { TextUtility } from "../utils/TextUtility";
 import { FileUtility } from "../utils/FileUtility";
 import { Message } from "../utils/MessageUtility";
-import memberRouter from "./member/member.router";
-import memoRouter from "./memo/memo.router";
 import { container } from "../common/inversify/container";
 import { DbMiddleware } from "../middleWare/DbMiddleware";
 import { DI_TYPES } from "../common/inversify/DI_TYPES";
 import { XssChecker } from "../utils/XssChecker";
-import fileRouter from "./file/file.router";
+import { FileController } from "./file/file.controller";
+import { MemoController } from "./memo/memo.controller";
+import { MemberController } from "./member/member.controller";
 
 const dbMiddleware = container.get<DbMiddleware>(DI_TYPES.DbMiddleWare);
+const fileController = container.get<FileController>(DI_TYPES.FileController);
+const memoController = container.get<MemoController>(DI_TYPES.MemoController);
+const memberController = container.get<MemberController>(DI_TYPES.MemberController);
 const upload = multer({});
 const router = express.Router();
 
@@ -54,9 +57,9 @@ router.use(async (req: Request, res: Response, next: NextFunction) => {
 
 router.use(dbMiddleware.attachDb());
 
-router.use("/file", fileRouter);
-router.use("/member", memberRouter);
-router.use("/memo", memoRouter);
+router.use("/file", fileController.getRouter());
+router.use("/member", memberController.getRouter());
+router.use("/memo", memoController.getRouter());
 
 //next가 없을경우 에러가 정상적으로 처리되지 않음.
 router.use(async (err: Errback | Message | ZodError, req: Request, res: Response, next: NextFunction) => {

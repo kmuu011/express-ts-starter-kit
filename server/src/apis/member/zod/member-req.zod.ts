@@ -9,12 +9,12 @@ export const LoginSchema = z.object({
     .max(20, '아이디는 최대 20자까지 가능합니다.')
     .regex(/^[a-zA-Z0-9_]+$/, '아이디는 영문, 숫자, 언더스코어만 사용 가능합니다.')
     .describe('사용자 아이디')
-    .openapi({ example: 'qa2' }),
+    .openapi({ example: 'qa1' }),
   password: z.string()
     .min(2, '비밀번호는 최소 2자 이상이어야 합니다.')
     .max(50, '비밀번호는 최대 50자까지 가능합니다.')
     .describe('사용자 비밀번호')
-    .openapi({ example: 'qa2' })
+    .openapi({ example: 'qa1' })
 })
 
 export const SignupSchema = z.object({
