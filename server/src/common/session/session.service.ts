@@ -6,7 +6,7 @@ import { MemberDao } from "../../apis/member/member.dao";
 import { inject, injectable } from "inversify";
 import { DI_TYPES } from "../inversify/DI_TYPES";
 import { Utility } from "../../utils/Utility";
-import { MemberModel } from "../../apis/member/member.types";
+import { MemberModelType } from "../../apis/member/member.types";
 
 @injectable()
 export class SessionService {
@@ -17,7 +17,7 @@ export class SessionService {
   }
 
   public async createSession(
-    memberInfo: MemberModel,
+    memberInfo: MemberModelType,
     userAgent: string
   ): Promise<string> {
     const payload = {

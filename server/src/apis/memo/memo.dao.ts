@@ -1,10 +1,10 @@
-import {Database} from "../../utils/Database";
-import mysql, {ResultSetHeader} from "mysql2";
-import {PaginatedDaoData} from "../../interfaces/common";
-import {MemoModel} from "./memo.model";
-import {injectable} from "inversify";
-import {BaseDao} from "../../common/base/base.dao";
-import {SqlBuilder} from "../../utils/SqlBuilder";
+import { Database } from "../../utils/Database";
+import mysql, { ResultSetHeader } from "mysql2";
+import { PaginatedDaoData } from "../../interfaces/common";
+import { injectable } from "inversify";
+import { BaseDao } from "../../common/base/base.dao";
+import { SqlBuilder } from "../../utils/SqlBuilder";
+import { MemoModelType } from "./memo.types";
 
 @injectable()
 export class MemoDao extends BaseDao {
@@ -20,10 +20,10 @@ export class MemoDao extends BaseDao {
       db: Database,
       idx: number
     }
-  ): Promise<MemoModel> {
+  ): Promise<MemoModelType | undefined> {
     const sql = mysql.format("SELECT * FROM memo WHERE idx = ? ", [idx]);
 
-    return (await db.query({sql}))[0];
+    return (await db.query({ sql }))[0] as MemoModelType | undefined;
   }
 
   async selectList(
@@ -38,7 +38,7 @@ export class MemoDao extends BaseDao {
       count: number,
       memberIdx: number,
     }
-  ): Promise<PaginatedDaoData<MemoModel>> {
+  ): Promise<PaginatedDaoData<MemoModelType>> {
     const sql = mysql.format("SELECT * " +
       "FROM memo " +
       "WHERE memberIdx = ? " +
@@ -50,11 +50,11 @@ export class MemoDao extends BaseDao {
       ]
     );
 
-    const itemList: MemoModel[] = await db.query({sql});
+    const itemList: MemoModelType[] = await db.query({ sql }) as MemoModelType[];
 
     const cntSql = "SELECT count(*) cnt FROM memo";
 
-    const totalCount: number = (await db.query({sql: cntSql}))[0].cnt;
+    const totalCount: number = (await db.query({ sql: cntSql }))[0].cnt;
 
     return {
       itemList,

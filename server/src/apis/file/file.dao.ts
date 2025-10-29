@@ -1,5 +1,5 @@
 import {Database} from "../../utils/Database";
-import {FileModel} from "./file.model";
+import {FileModelType} from "./file.types";
 import mysql from "mysql2";
 import {PaginatedDaoData} from "../../interfaces/common";
 import {SqlBuilder} from "../../utils/SqlBuilder";
@@ -18,13 +18,13 @@ export class FileDao {
       db: Database,
       idx: number
     }
-  ): Promise<FileModel> {
+  ): Promise<FileModelType | undefined> {
     const sql = mysql.format(
       "SELECT * FROM file WHERE idx = ? ",
       [idx]
     );
 
-    return (await db.query({sql}))[0];
+    return (await db.query({sql}))[0] as FileModelType | undefined;
   }
 
   async selectList(
@@ -37,7 +37,7 @@ export class FileDao {
       page: number,
       count: number,
     }
-  ): Promise<PaginatedDaoData<FileModel>> {
+  ): Promise<PaginatedDaoData<FileModelType>> {
     const sql = mysql.format("SELECT * " +
       "FROM file " +
       "ORDER BY idx DESC " +
@@ -45,7 +45,7 @@ export class FileDao {
       [(page - 1) * count, count]
     );
 
-    const itemList: FileModel[] = await db.query({sql});
+    const itemList: FileModelType[] = await db.query({sql});
 
     const cntSql = "SELECT count(*) cnt FROM file";
 

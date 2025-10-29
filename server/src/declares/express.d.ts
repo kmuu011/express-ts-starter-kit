@@ -1,7 +1,7 @@
 import { Database } from "../utils/Database";
-import { FileModel } from "../apis/file/file.model";
 import { MemberModelType } from "../apis/member/member.types";
 import { MemoModelType } from "../apis/memo/memo.types";
+import { FileModelType } from "../apis/file/file.types";
 
 declare module 'express' {
   export interface Request {
@@ -15,6 +15,6 @@ declare module 'express' {
     organizedFileList?: Record<string, OrganizedFile[]>;
     memberInfo?: MemberModelType;
     memoInfo?: MemoModelType;
-    fileInfo?: FileModel;
+    fileInfo?: FileModelType;
   }
 }
