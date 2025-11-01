@@ -1,12 +1,40 @@
-const dirPath = __dirname.substring(0, __dirname.lastIndexOf('server') + 'server'.length);
 import * as dotenv from "dotenv"
+import * as path from "node:path";
+import * as fs from "node:fs";
 
-dotenv.config({path: `${dirPath}/env/.env.${SERVER_TYPE}`});
+if (!process.env.npm_lifecycle_event) {
+  throw "npm_lifecycle_event 환경 변수가 설정되어 있지 않습니다.";
+}
+
+const serverType = process.env.npm_lifecycle_event?.split(':')[0];
+
+const dirPath = __dirname.substring(0, __dirname.lastIndexOf('server') + 'server'.length);
+
+dotenv.config({path: `${dirPath}/env/.env.${serverType}`});
+
+const loadEnvFiles = () => {
+  const envDir = path.join(__dirname, '../../../');
+
+  const envFiles = [
+    path.join(envDir, '.env'),
+    path.join(envDir, `.env.${serverType}`),
+  ];
+
+  envFiles.forEach(envFile => {
+    if (fs.existsSync(envFile)) {
+      console.log(`Loading environment file: ${envFile}`);
+      require('dotenv').config({ path: envFile });
+    }
+  });
+};
+
+loadEnvFiles();
 
 const envConfig = process.env;
 
 const config = {
-  port: 8200,
+  serverType,
+  port: envConfig.SERVER_PORT,
 
   memberAuth: {
     salt: 'thisIsSalt',

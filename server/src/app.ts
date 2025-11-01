@@ -1,5 +1,4 @@
 require('express-async-errors');
-require("./global");
 
 import express from 'express';
 import cors from 'cors';
@@ -35,7 +34,7 @@ app.use(async (req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'DELETE, GET, POST, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
   res.header("Access-Control-Expose-Headers", "new-session-key");
-  res.header('Content-Security-Policy', "frame-ancestors 'self' http://127.0.0.1:3000");
+  res.header('Content-Security-Policy', "frame-ancestors 'self' http://127.0.0.1:3000, http://localhost:8100, http://127.0.0.1:8100");
 
   next();
 });

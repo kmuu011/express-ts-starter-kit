@@ -24,8 +24,14 @@ Object.entries(allSchemas).forEach(([name, schema]) => {
 registry.registerComponent('securitySchemes', 'cookieAuth', {
   type: 'apiKey',
   in: 'cookie',
-  name: 'token',
-  description: '쿠키 기반 인증 토큰',
+  name: 'session-key',
+  description: '쿠키 기반 세션 키 인증',
+});
+registry.registerComponent('securitySchemes', 'headerAuth', {
+  type: 'apiKey',
+  in: 'header',
+  name: 'session-key',
+  description: '헤더 기반 세션 키 인증',
 });
 
 // 4) 경로 등록
@@ -41,5 +47,5 @@ export const swaggerSpec = generator.generateDocument({
     description: 'Zod 기반 자동 생성 Swagger 문서',
   },
   servers: [{ url: 'http://localhost:8100', description: 'Dev server' }],
-  // components.schemas는 generator가 registry에서 자동 생성하므로 명시 불필요
+  security: [{ cookieAuth: []}, { headerAuth: [] }],
 });

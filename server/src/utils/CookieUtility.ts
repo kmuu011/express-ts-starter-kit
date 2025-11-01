@@ -11,7 +11,7 @@ export class CookieUtility {
       sessionKey,
       {
         httpOnly: true,
-        secure: SERVER_TYPE !== "dev",
+        secure: config.serverType !== "dev",
         sameSite: "strict",
         maxAge: config.memberAuth.expireTime * 1000
       }

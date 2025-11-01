@@ -1,6 +1,9 @@
-cd ..
-cd docker-compose
-cd prod
+#!/bin/bash
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# 서버 디렉토리로 이동
+cd "$PROJECT_ROOT/docker-compose/prod"
 
 docker compose stop node_0
 docker compose rm -f node_0

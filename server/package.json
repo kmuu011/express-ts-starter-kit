@@ -3,9 +3,10 @@
   "version": "1.0",
   "private": true,
   "scripts": {
-    "start:production": "NODE_ENV=production node dist/bin/www.js",
-    "start:dev": "NODE_ENV=dev ts-node-dev --respawn --transpile-only src/bin/www.ts",
-    "build": "tsc"
+    "dev:start": "dotenv -e .env -e .env.dev -- ts-node-dev --respawn --transpile-only src/bin/www.ts",
+    "dev:build": "dotenv -e .env -e .env.dev -- tsc",
+    "prod:start": "dotenv -e .env -e .env.prod -- node dist/bin/www.js",
+    "prod:build": "dotenv -e .env -e .env.prod -- tsc"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.1.0",

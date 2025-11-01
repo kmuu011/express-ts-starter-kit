@@ -8,7 +8,7 @@ app.set('port', config.port);
 (async () => {
   const server = http.createServer(app);
 
-  server.listen(app.get('port'));
+  server.listen(app.get('port'), '0.0.0.0');
 })().catch(err => {
   throw err;
 });
