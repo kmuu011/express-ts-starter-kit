@@ -1,5 +1,6 @@
 export const DI_TYPES = {
   Database: Symbol.for("Database"),
+  DatabaseProvider: Symbol.for("DatabaseProvider"),
   TokenService: Symbol.for("TokenService"),
   SessionService: Symbol.for("SessionService"),
   CacheService: Symbol.for("CacheService"),

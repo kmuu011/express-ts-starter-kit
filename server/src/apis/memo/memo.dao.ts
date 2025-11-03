@@ -1,26 +1,28 @@
-import { Database } from "../../utils/Database";
 import mysql, { ResultSetHeader } from "mysql2";
 import { PaginatedDaoData } from "../../interfaces/common";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { BaseDao } from "../../common/base/base.dao";
 import { SqlBuilder } from "../../utils/SqlBuilder";
 import { MemoModelType } from "./memo.types";
-
+import { DI_TYPES } from "../../common/inversify/DI_TYPES";
+import { DatabaseProvider } from "../../infra/db/DBProvider";
 @injectable()
 export class MemoDao extends BaseDao {
-  constructor() {
+  constructor(
+    @inject(DI_TYPES.DatabaseProvider) private readonly dbProvider: DatabaseProvider
+  ) {
     super();
   }
 
   async selectOne(
     {
-      db,
       idx
     }: {
-      db: Database,
       idx: number
     }
   ): Promise<MemoModelType | undefined> {
+    const db = this.dbProvider.get();
+
     const sql = mysql.format("SELECT * FROM memo WHERE idx = ? ", [idx]);
 
     return (await db.query({ sql }))[0] as MemoModelType | undefined;
@@ -28,17 +30,17 @@ export class MemoDao extends BaseDao {
 
   async selectList(
     {
-      db,
       page,
       count,
       memberIdx,
     }: {
-      db: Database,
       page: number,
       count: number,
       memberIdx: number,
     }
   ): Promise<PaginatedDaoData<MemoModelType>> {
+    const db = this.dbProvider.get();
+
     const sql = mysql.format("SELECT * " +
       "FROM memo " +
       "WHERE memberIdx = ? " +
@@ -64,15 +66,15 @@ export class MemoDao extends BaseDao {
 
   async insert(
     {
-      db,
       memberIdx,
       content,
     }: {
-      db: Database,
       memberIdx: number,
       content: string
     }
   ): Promise<ResultSetHeader> {
+    const db = this.dbProvider.get();
+
     const dataObj = {
       memberIdx,
       content,
@@ -94,15 +96,15 @@ export class MemoDao extends BaseDao {
 
   async update(
     {
-      db,
       idx,
       content,
     }: {
-      db: Database,
       idx: number,
       content: string
     }
   ): Promise<ResultSetHeader> {
+    const db = this.dbProvider.get();
+
     const dataObj = {
       content,
     };
@@ -128,13 +130,13 @@ export class MemoDao extends BaseDao {
 
   async delete(
     {
-      db,
       idx
     }: {
-      db: Database,
       idx: number
     }
   ) {
+    const db = this.dbProvider.get();
+
     const sql = mysql.format("DELETE FROM memo WHERE idx = ? ", [idx]);
 
     return await db.query({

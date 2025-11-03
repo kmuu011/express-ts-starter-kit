@@ -1,29 +1,32 @@
-import { Database } from "../../utils/Database";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { BaseDao } from "../../common/base/base.dao";
 import { SqlBuilder } from "../../utils/SqlBuilder";
 import { ResultSetHeader } from "mysql2";
 import { MemberModelType } from "./member.types";
+import { DI_TYPES } from "../../common/inversify/DI_TYPES";
+import { DatabaseProvider } from "../../infra/db/DBProvider";
 
 @injectable()
 export class MemberDao extends BaseDao {
-  constructor() {
+  constructor(
+    @inject(DI_TYPES.DatabaseProvider) private readonly dbProvider: DatabaseProvider
+  ) {
     super();
   }
 
   async selectOne(
     {
-      db,
       id,
       encryptedPassword,
       idx
     }: {
-      db: Database,
       id?: string,
       encryptedPassword?: string,
       idx?: number
     }
   ): Promise<MemberModelType | undefined> {
+    const db = this.dbProvider.get();
+
     this.validateArguments(arguments);
 
     const dataObj = {
@@ -47,15 +50,15 @@ export class MemberDao extends BaseDao {
 
   async insert(
     {
-      db,
       id,
       encryptedPassword,
     }: {
-      db: Database,
       id: string,
       encryptedPassword: string
     }
   ): Promise<ResultSetHeader> {
+    const db = this.dbProvider.get();
+    
     const dataObj = {
       id,
       password: encryptedPassword

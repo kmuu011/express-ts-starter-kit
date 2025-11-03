@@ -5,14 +5,15 @@ import { TextUtility } from "../utils/TextUtility";
 import { FileUtility } from "../utils/FileUtility";
 import { Message } from "../utils/MessageUtility";
 import { container } from "../common/inversify/container";
-import { DbMiddleware } from "../middleWare/DbMiddleware";
 import { DI_TYPES } from "../common/inversify/DI_TYPES";
 import { XssChecker } from "../utils/XssChecker";
 import { FileController } from "./file/file.controller";
 import { MemoController } from "./memo/memo.controller";
 import { MemberController } from "./member/member.controller";
+import { DBContext } from '../infra/db/DBContext';
+import { Database } from '../utils/Database';
+import onFinished from 'on-finished';
 
-const dbMiddleware = container.get<DbMiddleware>(DI_TYPES.DbMiddleWare);
 const fileController = container.get<FileController>(DI_TYPES.FileController);
 const memoController = container.get<MemoController>(DI_TYPES.MemoController);
 const memberController = container.get<MemberController>(DI_TYPES.MemberController);
@@ -55,7 +56,15 @@ router.use(async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-router.use(dbMiddleware.attachDb());
+router.use((req, res, next) => {
+  const db = container.get<Database>(DI_TYPES.Database); // 여기서 “요청용 DB 연결/세션”을 확보
+  DBContext.run(db, () => {
+    onFinished(res, async () => {
+      try { await db.release(); } catch {}
+    });
+    next();
+  });
+});
 
 router.use("/file", fileController.getRouter());
 router.use("/member", memberController.getRouter());

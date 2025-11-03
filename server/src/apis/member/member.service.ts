@@ -6,7 +6,8 @@ import { DI_TYPES } from "../../common/inversify/DI_TYPES";
 import { Message } from "../../utils/MessageUtility";
 import { keyDescriptionObj } from "../../constants/keyDescriptionObj";
 import { MemberModelType } from "./member.types";
-import { Database } from "../../utils/Database";
+import { MemoDao } from "../memo/memo.dao";
+import { Transactional } from "../../infra/db/Transactional";
 
 const duplicateCheckType = [
   "id"
@@ -16,12 +17,12 @@ const duplicateCheckType = [
 export class MemberService {
   constructor(
     @inject(DI_TYPES.MemberDao) private readonly memberDao: MemberDao,
+    @inject(DI_TYPES.MemoDao) private readonly memoDao: MemoDao,
     @inject(DI_TYPES.SessionService) private readonly sessionService: SessionService
   ) {
   }
 
   public async login(
-    db: Database,
     id: string,
     password: string,
     userAgent: string
@@ -29,7 +30,6 @@ export class MemberService {
     const encryptedPassword = EncryptUtility.encryptMemberPassword(password);
 
     const memberInfo = await this.memberDao.selectOne({
-      db,
       id,
       encryptedPassword
     });
@@ -48,7 +48,6 @@ export class MemberService {
   }
 
   public async duplicateCheck(
-    db: Database,
     value: string,
     type: number
   ): Promise<boolean> {
@@ -57,20 +56,18 @@ export class MemberService {
     if (!valueKey) throw Message.WRONG_PARAM(keyDescriptionObj.type);
 
     const memberInfo = await this.memberDao.selectOne({
-      db,
       [valueKey]: value
     });
 
     return !!memberInfo;
   }
 
+  @Transactional()
   public async signup(
-    db: Database,
     id: string,
     password: string
   ): Promise<void> {
     const duplicatedMemberInfo = await this.memberDao.selectOne({
-      db,
       id
     });
 
@@ -80,10 +77,16 @@ export class MemberService {
 
     const encryptedPassword = EncryptUtility.encryptMemberPassword(password);
 
-    await this.memberDao.insert({
-      db,
+    const result = await this.memberDao.insert({
       id,
       encryptedPassword
+    });
+
+    const insertId = result.insertId;
+
+    await this.memoDao.insert({
+      memberIdx: insertId,
+      content: "안녕하세요. 첫 메모입니다."
     });
   }
 

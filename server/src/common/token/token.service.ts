@@ -74,7 +74,6 @@ export class TokenService {
     }
 
     const memberInfo = await this.memberDao.selectOne({
-      db: req.db!,
       idx: payload.idx
     });
 

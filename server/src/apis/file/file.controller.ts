@@ -1,18 +1,19 @@
-import {inject, injectable} from "inversify";
-import {DI_TYPES} from "../../common/inversify/DI_TYPES";
-import {FileService} from "./file.service";
-import {NextFunction, Request, Response, Router} from "express";
-import {BaseController} from "../../common/base/base.controller";
-import {MemberMiddleware} from "../../middleWare/MemberMiddleware";
+import { inject, injectable } from "inversify";
+import { DI_TYPES } from "../../common/inversify/DI_TYPES";
+import { FileService } from "./file.service";
+import { NextFunction, Request, Response, Router } from "express";
+import { BaseController } from "../../common/base/base.controller";
+import { MemberMiddleware } from "../../middleWare/MemberMiddleware";
 import multer from "multer";
-import {config} from "../../config";
-import {mkdirSync} from "fs";
-import {KeyUtility} from "../../utils/KeyUtility";
-import {existsSync} from "node:fs";
-import {Message} from "../../utils/MessageUtility";
-import {keyDescriptionObj} from "../../constants/keyDescriptionObj";
-import {validateQuery, validateParams} from "../../common/middleware/zod-validation.middleware";
-import {FileListQuerySchema, FileParamsSchema} from "./zod/file-req.zod";
+import { config } from "../../config";
+import { mkdirSync } from "fs";
+import { KeyUtility } from "../../utils/KeyUtility";
+import { existsSync } from "node:fs";
+import { Message } from "../../utils/MessageUtility";
+import { keyDescriptionObj } from "../../constants/keyDescriptionObj";
+import { validateQuery, validateParams } from "../../common/middleware/zod-validation.middleware";
+import { FileListQuerySchema, FileParamsSchema } from "./zod/file-req.zod";
+import { DatabaseProvider } from "../../infra/db/DBProvider";
 
 @injectable()
 export class FileController extends BaseController {
@@ -21,7 +22,8 @@ export class FileController extends BaseController {
 
   constructor(
     @inject(DI_TYPES.FileService) private readonly fileService: FileService,
-    @inject(DI_TYPES.MemberMiddleware) memberMiddleware: MemberMiddleware
+    @inject(DI_TYPES.MemberMiddleware) memberMiddleware: MemberMiddleware,
+    @inject(DI_TYPES.DatabaseProvider) private readonly dbProvider: DatabaseProvider
   ) {
     super();
     this.memberMiddleware = memberMiddleware;
@@ -38,12 +40,12 @@ export class FileController extends BaseController {
         file.fileName = fileName;
         file.fileType = fileType;
 
-        mkdirSync(path, {recursive: true});
+        mkdirSync(path, { recursive: true });
 
         cb(null, path);
       },
       filename: async (req, file, cb) => {
-        const db = req.db!;
+        const db = this.dbProvider.get();
         const fileType = (file.originalname.substring(file.originalname.lastIndexOf('.') + 1)).toLowerCase();
         const path = `${config.filePath.file}/`;
 
@@ -62,7 +64,7 @@ export class FileController extends BaseController {
 
     return multer({
       storage: storage,
-      limits: {fileSize: 30 * 1024 * 1024 * 1024}
+      limits: { fileSize: 30 * 1024 * 1024 * 1024 }
     });
   }
 
@@ -105,7 +107,7 @@ export class FileController extends BaseController {
           filePath,
           `${fileInfo?.fileName}.${fileInfo?.fileType}`,
           (err) => {
-            if(!res.headersSent){
+            if (!res.headersSent) {
               console.log(err);
               throw Message.SERVER_ERROR;
             }
@@ -124,32 +126,35 @@ export class FileController extends BaseController {
   }
 
   public async getList(req: Request, res: Response, next: NextFunction) {
+    const memberIdx = req.memberInfo!.idx;
     const { page, count } = req.validated?.query as { page: number; count: number };
 
-    const result = await this.fileService.selectList(req.db!, page, count);
+    const result = await this.fileService.selectList(page, count, memberIdx);
 
     res.json(result);
   }
 
   public async getOne(req: Request, res: Response, next: NextFunction) {
+    const memberIdx = req.memberInfo!.idx;
     const { fileIdx } = req.validated?.params as { fileIdx: number };
-    
-    req.fileInfo = await this.fileService.selectOne(req.db!, fileIdx);
+
+    req.fileInfo = await this.fileService.selectOne(fileIdx, memberIdx);
   }
 
   public async uploadFile(req: Request, res: Response, next: NextFunction) {
     const memberIdx = req.memberInfo!.idx;
     const fileList = req?.files as MulterFile[];
 
-    await this.fileService.insert(req.db!, memberIdx, fileList);
+    await this.fileService.insert(memberIdx, fileList);
 
     this.sendSuccess(res);
   }
 
   public async delete(req: Request, res: Response, next: NextFunction) {
+    const memberIdx = req.memberInfo!.idx;
     const fileInfo = req.fileInfo;
 
-    await this.fileService.delete(req.db!, fileInfo);
+    await this.fileService.delete(fileInfo, memberIdx);
 
     this.sendSuccess(res);
   }

@@ -55,7 +55,6 @@ export class MemberController extends BaseController {
     const userInfo = Utility.getIpUserAgent(req);
 
     const { sessionKey } = await this.memberService.login(
-      req.db!,
       id,
       password,
       userInfo.userAgent
@@ -71,7 +70,7 @@ export class MemberController extends BaseController {
   public async signup(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id, password } = req.validated?.body as SignupType;
 
-    await this.memberService.signup(req.db!, id, password);
+    await this.memberService.signup(id, password);
 
     this.sendSuccess(res);
   }
@@ -80,7 +79,6 @@ export class MemberController extends BaseController {
     const { value, type } = req.validated?.query as DuplicateCheckType;
 
     const isDuplicated = await this.memberService.duplicateCheck(
-      req.db!,
       value,
       type
     );

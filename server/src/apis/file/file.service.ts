@@ -12,12 +12,12 @@ export class FileService {
   }
 
   async selectOne(
-    db: any,
-    fileIdx: number
+    fileIdx: number,
+    memberIdx: number
   ) {
     const file = await this.fileDao.selectOne({
-      db,
-      idx: fileIdx
+      idx: fileIdx,
+      memberIdx
     });
 
     if (!file) {
@@ -28,19 +28,18 @@ export class FileService {
   }
 
   async selectList(
-    db: any,
     page: number,
-    count: number
+    count: number,
+    memberIdx: number
   ) {
     return await this.fileDao.selectList({
-      db,
       page,
-      count
+      count,
+      memberIdx
     });
   }
 
   async insert(
-    db: any,
     memberIdx: number,
     fileList: MulterFile[]
   ) {
@@ -55,7 +54,6 @@ export class FileService {
       } = file;
 
       await this.fileDao.insert({
-        db,
         fileKey,
         fileName: fileName!,
         fileType: fileType!,
@@ -66,8 +64,8 @@ export class FileService {
   }
 
   async delete(
-    db: any,
-    fileInfo: any
+    fileInfo: any,
+    memberIdx: number
   ) {
     const filePath = config.staticPath + fileInfo?.fileKey;
 
@@ -76,8 +74,8 @@ export class FileService {
     }
 
     await this.fileDao.delete({
-      db,
-      idx: fileInfo?.idx!
+      idx: fileInfo?.idx!,
+      memberIdx
     });
   }
 

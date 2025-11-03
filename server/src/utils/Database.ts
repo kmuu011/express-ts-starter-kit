@@ -2,6 +2,7 @@ import mysql, {PoolConnection, RowDataPacket} from 'mysql2';
 import {config} from "../config";
 import {Message} from "./MessageUtility";
 import {injectable} from "inversify";
+import { Utility } from './Utility';
 
 const activateQuestionMark = (text: string) => {
   return text.replace(/\？/g, '?');
@@ -14,6 +15,12 @@ export class Database {
   public isReleased: boolean = true;
   private connection: PoolConnection | null = null;
   private isTransactionStarted: Boolean = false;
+
+  private _debugId = Utility.createRandomString(10);
+
+  get debugId(): string {
+    return this._debugId;
+  }
 
   constructor() {
   }

@@ -72,7 +72,6 @@ export class SessionService {
     }
 
     const memberInfo = await this.memberDao.selectOne({
-      db: req.db!,
       idx: payload.idx
     });
 

@@ -1,55 +1,63 @@
-import {Database} from "../../utils/Database";
-import {FileModelType} from "./file.types";
+import { FileModelType } from "./file.types";
 import mysql from "mysql2";
-import {PaginatedDaoData} from "../../interfaces/common";
-import {SqlBuilder} from "../../utils/SqlBuilder";
-import {injectable} from "inversify";
+import { PaginatedDaoData } from "../../interfaces/common";
+import { SqlBuilder } from "../../utils/SqlBuilder";
+import { inject, injectable } from "inversify";
+import { DI_TYPES } from "../../common/inversify/DI_TYPES";
+import { DatabaseProvider } from "../../infra/db/DBProvider";
 
 @injectable()
 export class FileDao {
-  constructor() {
+  constructor(
+    @inject(DI_TYPES.DatabaseProvider) private readonly dbProvider: DatabaseProvider
+  ) {
   }
 
   async selectOne(
     {
-      db,
-      idx
+      idx,
+      memberIdx
     }: {
-      db: Database,
       idx: number
+      memberIdx: number
     }
   ): Promise<FileModelType | undefined> {
+    const db = this.dbProvider.get();
+
     const sql = mysql.format(
-      "SELECT * FROM file WHERE idx = ? ",
-      [idx]
+      "SELECT * FROM file WHERE idx = ? AND memberIdx = ? ",
+      [idx, memberIdx]
     );
 
-    return (await db.query({sql}))[0] as FileModelType | undefined;
+    return (await db.query({ sql }))[0] as FileModelType | undefined;
   }
 
   async selectList(
     {
-      db,
       page,
       count,
+      memberIdx,
     }: {
-      db: Database,
       page: number,
       count: number,
+      memberIdx: number,
     }
   ): Promise<PaginatedDaoData<FileModelType>> {
+    const db = this.dbProvider.get();
+
     const sql = mysql.format("SELECT * " +
       "FROM file " +
+      "WHERE memberIdx = ? " +
       "ORDER BY idx DESC " +
       "LIMIT ?, ?",
-      [(page - 1) * count, count]
+      [memberIdx, (page - 1) * count, count]
     );
 
-    const itemList: FileModelType[] = await db.query({sql});
+    const itemList: FileModelType[] = await db.query({ sql });
 
-    const cntSql = "SELECT count(*) cnt FROM file";
+    const cntSql = mysql.format("SELECT count(*) cnt FROM file WHERE memberIdx = ?", [memberIdx]);
 
-    const totalCount: number = (await db.query({sql: cntSql}))[0].cnt;
+    const totalCount: number = (await db.query({ sql: cntSql }))[0].cnt;
 
     return {
       itemList,
@@ -59,14 +67,12 @@ export class FileDao {
 
   async insert(
     {
-      db,
       fileKey,
       fileName,
       fileType,
       fileSize,
       memberIdx,
     }: {
-      db: Database,
       fileKey: string,
       fileName: string,
       fileType: string,
@@ -74,6 +80,8 @@ export class FileDao {
       memberIdx: number,
     }
   ) {
+    const db = this.dbProvider.get();
+
     const dataObj = {
       fileKey,
       fileName,
@@ -99,14 +107,19 @@ export class FileDao {
 
   async delete(
     {
-      db,
-      idx
+      idx,
+      memberIdx
     }: {
-      db: Database,
       idx: number
+      memberIdx: number
     }
   ) {
-    const sql = mysql.format("DELETE FROM file WHERE idx = ? ", [idx]);
+    const db = this.dbProvider.get();
+
+    const sql = mysql.format(
+      "DELETE FROM file WHERE idx = ? AND memberIdx = ? ",
+      [idx, memberIdx]
+    );
 
     return await db.query({
       sql,

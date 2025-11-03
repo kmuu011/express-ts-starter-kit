@@ -13,18 +13,18 @@ import {MemberMiddleware} from "../../middleWare/MemberMiddleware";
 import {MemoController} from "../../apis/memo/memo.controller";
 import {MemberController} from "../../apis/member/member.controller";
 import {cacheServiceInstance} from "../cache/cache.instance";
-import {DbMiddleware} from "../../middleWare/DbMiddleware";
 import {FileDao} from "../../apis/file/file.dao";
 import {FileService} from "../../apis/file/file.service";
 import {FileController} from "../../apis/file/file.controller";
+import { AlsDatabaseProvider } from "../../infra/db/DBProvider";
 
 const container = new Container();
 
 container.bind<Database>(DI_TYPES.Database).to(Database).inRequestScope();
+container.bind<AlsDatabaseProvider>(DI_TYPES.DatabaseProvider).to(AlsDatabaseProvider).inSingletonScope();
 container.bind<CacheService>(DI_TYPES.CacheService).toConstantValue(cacheServiceInstance);
 container.bind<TokenService>(DI_TYPES.TokenService).to(TokenService);
 container.bind<SessionService>(DI_TYPES.SessionService).to(SessionService);
-container.bind<DbMiddleware>(DI_TYPES.DbMiddleWare).to(DbMiddleware);
 
 container.bind<MemberMiddleware>(DI_TYPES.MemberMiddleware).to(MemberMiddleware);
 container.bind<MemberDao>(DI_TYPES.MemberDao).to(MemberDao);

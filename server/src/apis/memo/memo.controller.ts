@@ -65,7 +65,7 @@ export class MemoController extends BaseController {
     const { page, count } = req.validated?.query as MemoListQueryType;
     const memberIdx = req.memberInfo!.idx;
 
-    const result = await this.memoService.selectList(req.db!, page, count, memberIdx);
+    const result = await this.memoService.selectList(page, count, memberIdx);
 
     res.json(result);
   }
@@ -73,14 +73,14 @@ export class MemoController extends BaseController {
   public async getOne(req: Request, res: Response, next: NextFunction) {
     const { memoIdx } = req.validated?.params as MemoParamsType;
 
-    req.memoInfo = await this.memoService.selectOne(req.db!, memoIdx);
+    req.memoInfo = await this.memoService.selectOne(memoIdx);
   }
 
   public async insert(req: Request, res: Response, next: NextFunction) {
     const { content } = req.validated?.body as MemoCreateType;
     const memberIdx = req.memberInfo!.idx;
 
-    const result = await this.memoService.insert(req.db!, memberIdx, content);
+    const result = await this.memoService.insert(memberIdx, content);
 
     res.json(result);
   }
@@ -89,7 +89,7 @@ export class MemoController extends BaseController {
     const idx = req.memoInfo?.idx!;
     const { content } = req.validated?.body as MemoUpdateType;
 
-    await this.memoService.update(req.db!, idx, content);
+    await this.memoService.update(idx, content);
 
     this.sendSuccess(res);
   }
@@ -97,7 +97,7 @@ export class MemoController extends BaseController {
   public async delete(req: Request, res: Response, next: NextFunction) {
     const idx = req.memoInfo?.idx!;
 
-    await this.memoService.delete(req.db!, idx);
+    await this.memoService.delete(idx);
 
     this.sendSuccess(res);
   }
