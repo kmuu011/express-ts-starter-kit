@@ -117,3 +117,11 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-04-16 17:51:41
+
+CREATE DATABASE my_db_jest;
+USE my_db_jest;
+
+-- my_db의 테이블 구조만 복사
+CREATE TABLE file LIKE my_db.file;
+CREATE TABLE member LIKE my_db.member;
+CREATE TABLE memo LIKE my_db.memo;

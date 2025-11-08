@@ -33,7 +33,7 @@ services:
       ]
     volumes:
       - "mysql:/var/lib/mysql:Z"
-      - ./sql/initSql.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./sql/initsql.sql:/docker-entrypoint-initdb.d/init.sql:ro
     environment:
       MYSQL_PASSWORD: root
       MYSQL_USER: prod

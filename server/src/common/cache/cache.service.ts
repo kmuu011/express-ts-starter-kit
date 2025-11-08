@@ -1,7 +1,7 @@
-import {createClient, RedisClientType} from 'redis';
-import {Utility} from "../../utils/Utility";
-import {config} from "../../config";
-import {injectable} from "inversify";
+import { createClient, RedisClientType } from 'redis';
+import { Utility } from "../../utils/Utility";
+import { config } from "../../config";
+import { injectable } from "inversify";
 
 @injectable()
 export class CacheService {
@@ -16,14 +16,12 @@ export class CacheService {
     });
 
     this.redisClient.connect()
-      .then(() => {
-        console.log('Redis connected successfully.');
-      })
-      .catch((err) => {
+      .then(() => { })
+      .catch((err: Error) => {
         console.error('Redis connection error:', err);
       });
 
-    this.redisClient.on('error', (error) => {
+    this.redisClient.on('error', (error: Error) => {
       console.error('Redis error:', error);
     });
   }

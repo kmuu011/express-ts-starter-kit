@@ -6,7 +6,8 @@
     "dev:start": "dotenv -e .env -e .env.dev -- ts-node-dev --respawn --transpile-only src/bin/www.ts",
     "dev:build": "dotenv -e .env -e .env.dev -- tsc",
     "prod:start": "dotenv -e .env -e .env.prod -- node dist/bin/www.js",
-    "prod:build": "dotenv -e .env -e .env.prod -- tsc"
+    "prod:build": "dotenv -e .env -e .env.prod -- tsc",
+    "jest:run": "dotenv -e .env -e .env.jest -- jest --watchAll"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.1.0",
@@ -37,12 +38,17 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.10.0",
     "@types/on-finished": "^2.3.5",
+    "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6.0.4",
-    "@types/swagger-ui-express": "^4.1.8"
+    "@types/swagger-ui-express": "^4.1.8",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.5"
   }
 }
